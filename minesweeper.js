@@ -1,8 +1,8 @@
-const TILE_STATUS = {
+export const TILE_STATUS = {
   HIDDEN: "hidden",
   MINE: "mine",
   NUMBER: "number",
-  MARKEDL: "marked",
+  MARKED: "marked",
 };
 
 export function createBoard(boardsize, noOfMines) {
@@ -36,6 +36,32 @@ export function createBoard(boardsize, noOfMines) {
   return board;
 }
 
+export function markTile(tile){
+  if(tile.status!==TILE_STATUS.HIDDEN && tile.status!==TILE_STATUS.MARKED)
+  {
+      return 
+  }
+  if(tile.status ===TILE_STATUS.MARKED){
+      tile.setStatus=TILE_STATUS.HIDDEN;
+  }
+  else{
+      tile.setStatus=TILE_STATUS.MARKED;
+  }
+}
+
+export function revealTile(tile){
+    console.log(tile.x,tile.y)
+    if(tile.status!==TILE_STATUS.HIDDEN )
+    {
+        return; 
+    }
+    if(tile.mine)
+    {
+        tile.setStatus=TILE_STATUS.MINE;
+        return;
+    }
+    tile.setStatus=TILE_STATUS.NUMBER;
+}
 function getMinePosition(boardSize, noOfMines) {
   const position = [];
   while (position.length < noOfMines) {
