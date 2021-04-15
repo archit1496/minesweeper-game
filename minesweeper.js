@@ -36,6 +36,7 @@ export function createBoard(boardsize, noOfMines) {
   return board;
 }
 
+
 export function markTile(tile){
   if(tile.status!==TILE_STATUS.HIDDEN && tile.status!==TILE_STATUS.MARKED)
   {
@@ -49,7 +50,7 @@ export function markTile(tile){
   }
 }
 
-export function revealTile(tile){
+export function revealTile(board,tile){
     console.log(tile.x,tile.y)
     if(tile.status!==TILE_STATUS.HIDDEN )
     {
@@ -61,6 +62,15 @@ export function revealTile(tile){
         return;
     }
     tile.setStatus=TILE_STATUS.NUMBER;
+    const adjacentTile=countAdjacentTile(board,tile);
+    const mines=adjacentTile.filter(elm=>elm.mine);
+    if(mines.length==0)
+    {
+        adjacentTile.forEach(revealTile.bind(null,board))
+    }
+    else{
+        tile.element.innerText=mines.length;
+    }
 }
 function getMinePosition(boardSize, noOfMines) {
   const position = [];
@@ -83,4 +93,47 @@ function positionMatch(a, b) {
 
 function randomNumber(size) {
     return Math.floor(Math.random()* size);
+}
+
+function countAdjacentTile(board,{x,y}){
+   const tile=[];
+   for(let xOffset=-1;xOffset<=1;xOffset++)
+   {
+       for(let yOffset=-1;yOffset<=1;yOffset++)
+       {
+           const validTile=board[x+xOffset]?.[y+yOffset]
+           if(validTile)
+           {
+               tile.push(validTile);
+           }
+       }
+   }
+
+   return tile;
+}
+
+export function checkGameWin(board){
+    return board.every((row)=>{
+         return row.every((elm)=>{
+             return (elm.status===TILE_STATUS.NUMBER || (elm.mine && (elm.status===TILE_STATUS.HIDDEN || elm.status===TILE_STATUS.MARKED)))    
+         })
+    })
+}
+
+export function checkGameLose(board){
+
+  let mineCount=0;
+  board.forEach((row)=>{
+     row.forEach((elm)=>{
+         if(elm.status===TILE_STATUS.MINE)
+         {
+            mineCount++;
+         }
+     
+     });
+  })
+  if(mineCount>0)
+   return true;
+  else
+   return false;
 }

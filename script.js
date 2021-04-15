@@ -1,17 +1,19 @@
-import {createBoard,markTile , TILE_STATUS,revealTile} from './minesweeper.js';
+import {createBoard,markTile , TILE_STATUS,revealTile,checkGameWin,checkGameLose} from './minesweeper.js';
 
 const boardSize=10;
 const noOfTiles=10;
 const grid=(createBoard(boardSize,noOfTiles));
 console.log(grid)
-const board=document.querySelector('.board');
+const boardElement=document.querySelector('.board');
 let mineLeft=document.querySelector('[data-mine-count]')
+const messageText=document.querySelector('.subtext');
 
 grid.forEach((row)=>{
   row.forEach(elm=>{
-    board.append(elm.element);
+    boardElement.append(elm.element);
     elm.element.addEventListener('click',()=>{
-      revealTile(elm);
+      revealTile(grid,elm);
+      checkGameEnd(grid);
     })
     elm.element.addEventListener('contextmenu',e=>{
       console.log("double")
@@ -22,6 +24,38 @@ grid.forEach((row)=>{
   })
  
 })
+function checkGameEnd(board){
+  const win=checkGameWin(board);
+  const lose=checkGameLose(board);
+  
+  if(win || lose)
+  {
+    boardElement.addEventListener('click',stopProp,{capture:true})
+    boardElement.addEventListener('contextmenu',stopProp,{capture:true});
+  }
+  if(win)
+  {
+    messageText.textContent="You Won!";
+  }
+  if(lose)
+  {
+    messageText.textContent="You lost";
+    board.forEach(row=>{
+      row.forEach(elm=>{
+        if(elm.status===TILE_STATUS.MARKED)
+          elm.setStatus=TILE_STATUS.MINE;
+        if(elm.mine)
+        {
+          revealTile(board,elm)
+        }
+      })
+    })
+  }
+}
+
+function stopProp(e){
+  e.stopImmediatePropagation()
+}
 
 function listOfMinesLeft(){
   const markedTilesCount=grid.reduce((count,row)=>{
@@ -30,5 +64,5 @@ function listOfMinesLeft(){
 
   mineLeft.textContent=noOfTiles-markedTilesCount;
 }
-board.style.setProperty("--size",boardSize);
+boardElement.style.setProperty("--size",boardSize);
 mineLeft.textContent=noOfTiles;
