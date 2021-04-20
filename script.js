@@ -30,8 +30,8 @@ function checkGameEnd(board){
   
   if(win || lose)
   {
-    boardElement.addEventListener('click',stopProp,{capture:true})
-    boardElement.addEventListener('contextmenu',stopProp,{capture:true});
+    boardElement.addEventListener('click',stopProp,true)
+    boardElement.addEventListener('contextmenu',stopProp,true);
   }
   if(win)
   {
